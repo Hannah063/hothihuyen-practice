@@ -44,7 +44,7 @@ class PostController extends Controller
      *         in="query",
      *         description="post's description",
      *         required=true,
-     *         @OA\Schema(type="text")
+     *         @OA\Schema(type="string")
      *     ),
      *     @OA\Response(response="201", description="Successfully"),
      *     @OA\Response(response="400", description="Errors")
@@ -117,7 +117,7 @@ class PostController extends Controller
      *         in="query",
      *         description="post's name",
      *         required=true,
-     *         @OA\Schema(type="text")
+     *         @OA\Schema(type="string")
      *     ),
      *     @OA\Parameter(
      *         name="description",

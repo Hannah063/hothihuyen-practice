@@ -3,62 +3,196 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/api/users",
+     *     summary="Get all users",
+     *     tags={"Get all users"},
+     *     @OA\Response(response="200", description="Success"),
+     *     security={{"bearerAuth":{}}}
+     * )
      */
     public function index()
     {
-        //
+        $users = DB::table('users')->get();
+        $arr = [
+            'status' => true,
+            'message' => "Thành công",
+            'data' => $users
+        ];
+        return response()->json($arr, 200);
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/users",
+     *     summary="Create a new user",
+     *     tags = {"Create a new user"},
+     *     @OA\Parameter(
+     *         name="name",
+     *         in="query",
+     *         description="name",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="email",
+     *         in="query",
+     *         description="email",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="password",
+     *         in="query",
+     *         description="password",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(response="201", description="Successfully"),
+     *     @OA\Response(response="400", description="Errors")
+     * )
      */
     public function store(Request $request)
     {
-        //
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password,
+        ];
+        $user = DB::table('users')->insert($data);
+        if ($user) {
+            return response()->json('Thành công', 200);
+        } else {
+            return response()->json('Thất bại', 400);
+        }
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/users/{id}",
+     *     summary="Get a user",
+     *     tags = {"Get a user"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="id",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(response="200", description="Success"),
+     *     @OA\Response(response="400", description="Errors"),
+     *     security={{"bearerAuth":{}}}
+     * )
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $user = DB::table('users')->where('id', $id)->first();
+        if ($user) {
+            $arr = [
+                'status' => true,
+                'message' => "Thành công",
+                'data' => $user
+            ];
+        } else {
+            $arr = [
+                'status' => false,
+                'message' => "Thất bại",
+                'data' => $user
+            ];
+        }
+        return response()->json($arr, 200);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * @OA\Put(
+     *     path="/api/users/{id}",
+     *     summary="Update a user",
+     *     tags = {"Update a user"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="user's id",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="name",
+     *         in="query",
+     *         description="name",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="email",
+     *         in="query",
+     *         description="email",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="password",
+     *         in="query",
+     *         description="password",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(response="201", description="Successfully"),
+     *     @OA\Response(response="400", description="Errors")
+     * )
      */
-    public function edit(string $id)
+    public function update($id, Request $request)
     {
-        //
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password,
+        ];
+        $user = DB::table('users')->where('id', $id)->update($data);
+        if ($user) {
+            $arr = [
+                'status' => true,
+                'message' => "Thành công",
+                'data' => $user
+            ];
+        } else {
+            $arr = [
+                'status' => false,
+                'message' => "Thất bại",
+                'data' => $user
+            ];
+        }
+        return response()->json($arr, 200);
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Delete(
+     *     path="/api/users/{id}",
+     *     summary="Delete a user",
+     *     tags = {"Delete a user"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="user's id",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(response="200", description="Success"),
+     *     @OA\Response(response="400", description="Errors"),
+     *     security={{"bearerAuth":{}}}
+     * )
      */
-    public function update(Request $request, string $id)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $user = DB::table('users')->where('id', $id)->delete();
+        if ($user) {
+            return response()->json('Thành công', 200);
+        } else {
+            return response()->json('Thất bại', 400);
+        }
     }
 }
