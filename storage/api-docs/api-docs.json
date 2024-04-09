@@ -218,6 +218,15 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "password_confirmation",
+                        "in": "query",
+                        "description": "password_confirmation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -300,6 +309,15 @@
                         "name": "password",
                         "in": "query",
                         "description": "password",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "password_confirmation",
+                        "in": "query",
+                        "description": "password_confirmation",
                         "required": true,
                         "schema": {
                             "type": "string"
