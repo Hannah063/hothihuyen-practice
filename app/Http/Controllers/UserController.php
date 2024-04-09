@@ -53,12 +53,36 @@ class UserController extends Controller
      *         required=true,
      *         @OA\Schema(type="string")
      *     ),
+     *     @OA\Parameter(
+     *         name="password_confirmation",
+     *         in="query",
+     *         description="password_confirmation",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
      *     @OA\Response(response="201", description="Successfully"),
      *     @OA\Response(response="400", description="Errors")
      * )
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|min:3|max:15',
+            'email' => 'required|string|email|unique:users,email',
+            'password' => 'required|string|confirmed',
+        ], [
+            'name.required' => 'Họ và tên bắt buộc phải nhập',
+            'name.string' => 'Họ và tên bắt buộc là string',
+            'name.min' => 'Họ và tên phải từ :min ký tự trở lên',
+            'name.max' => 'Họ và tên phải từ :max ký tự trở lên',
+            'email.required' => 'Email bắt buộc phải nhập',
+            'email.email' => 'Email không đúng định dạng',
+            'email.unique' => 'Email đã tồn tại trên hệ thống',
+            'email.string' => 'Email bắt buộc là string',
+            'password.required' => 'Password bắt buộc phải nhập',
+            'password.string' => 'Password bắt buộc là string',
+            'password.confirmed' => 'Password xác nhận không đúng',
+        ]);
         $data = [
             'name' => $request->name,
             'email' => $request->email,
@@ -147,6 +171,23 @@ class UserController extends Controller
      */
     public function update($id, Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|min:3|max:15',
+            'email' => 'required|string|email|unique:users,email',
+            'password' => 'required|string|confirmed',
+        ], [
+            'name.required' => 'Họ và tên bắt buộc phải nhập',
+            'name.string' => 'Họ và tên bắt buộc là string',
+            'name.min' => 'Họ và tên phải từ :min ký tự trở lên',
+            'name.max' => 'Họ và tên phải từ :max ký tự trở lên',
+            'email.required' => 'Email bắt buộc phải nhập',
+            'email.email' => 'Email không đúng định dạng',
+            'email.unique' => 'Email đã tồn tại trên hệ thống',
+            'email.string' => 'Email bắt buộc là string',
+            'password.required' => 'Password bắt buộc phải nhập',
+            'password.string' => 'Password bắt buộc là string',
+            'password.confirmed' => 'Password xác nhận không đúng',
+        ]);
         $data = [
             'name' => $request->name,
             'email' => $request->email,
