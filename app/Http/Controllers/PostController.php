@@ -52,6 +52,10 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'title' => 'required|unique:posts|max:100|min:5',
+            'description' => 'required|max:50|min:10',
+        ]);
         $data = [
             'title' => $request->title,
             'description' => $request->description,
@@ -132,6 +136,10 @@ class PostController extends Controller
      */
     public function update($id, Request $request)
     {
+        $request->validate([
+            'title' => 'required|unique:posts|max:100|min:5',
+            'description' => 'required|max:50|min:10',
+        ]);
         $data = [
             'title' => $request->title,
             'description' => $request->description,
