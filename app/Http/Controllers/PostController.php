@@ -53,8 +53,16 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|unique:posts|max:100|min:5',
+            'title' => 'required|unique:posts, title|max:100|min:5',
             'description' => 'required|max:50|min:10',
+        ], [
+            'title.required' => 'Title bắt buộc phải nhập',
+            'title.min' => 'Title phải từ :min ký tự trở lên',
+            'title.max' => 'Title phải từ :max ký tự trở lên',
+            'title.unique' => 'Title đã tồn tại trên hệ thống',
+            'description.required' => 'Description bắt buộc phải nhập',
+            'description.min' => 'Description phải từ :min ký tự trở lên',
+            'description.max' => 'Description phải từ :max ký tự trở lên',
         ]);
         $data = [
             'title' => $request->title,
@@ -139,6 +147,14 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required|unique:posts|max:100|min:5',
             'description' => 'required|max:50|min:10',
+        ], [
+            'title.required' => 'Title bắt buộc phải nhập',
+            'title.min' => 'Title phải từ :min ký tự trở lên',
+            'title.max' => 'Title phải từ :max ký tự trở lên',
+            'title.unique' => 'Title đã tồn tại trên hệ thống',
+            'description.required' => 'Description bắt buộc phải nhập',
+            'description.min' => 'Description phải từ :min ký tự trở lên',
+            'description.max' => 'Description phải từ :max ký tự trở lên',
         ]);
         $data = [
             'title' => $request->title,
