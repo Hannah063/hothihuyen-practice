@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
@@ -37,7 +39,7 @@ class PostController extends Controller
      *         in="query",
      *         description="post's name",
      *         required=true,
-     *         @OA\Schema(type="string")
+     *         @OA\Schema(type="string", )
      *     ),
      *     @OA\Parameter(
      *         name="description",
@@ -52,8 +54,8 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|unique:posts, title|max:100|min:5',
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|unique:posts|max:100|min:5',
             'description' => 'required|max:50|min:10',
         ], [
             'title.required' => 'Title bắt buộc phải nhập',
@@ -64,15 +66,31 @@ class PostController extends Controller
             'description.min' => 'Description phải từ :min ký tự trở lên',
             'description.max' => 'Description phải từ :max ký tự trở lên',
         ]);
-        $data = [
-            'title' => $request->title,
-            'description' => $request->description,
-        ];
-        $post = DB::table('posts')->insert($data);
-        if ($post) {
-            return response()->json('Thành công', 200);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors()->all();
+            return response()->json($errors, 412);
         } else {
-            return response()->json('Thất bại', 400);
+            $data = [
+                'title' => $request->title,
+                'description' => $request->description,
+            ];
+            $post = DB::table('posts')->insert($data);
+            if ($post) {
+                $arr = [
+                    'status' => true,
+                    'message' => "Thành công",
+                    'data' => $post
+                ];
+                return response()->json($arr, 200);
+            } else {
+                $arr = [
+                    'status' => false,
+                    'message' => "Thất bại",
+                    'data' => $post
+                ];
+                return response()->json($arr, 400);
+            }
         }
     }
 
@@ -144,7 +162,7 @@ class PostController extends Controller
      */
     public function update($id, Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => 'required|unique:posts|max:100|min:5',
             'description' => 'required|max:50|min:10',
         ], [
@@ -156,25 +174,31 @@ class PostController extends Controller
             'description.min' => 'Description phải từ :min ký tự trở lên',
             'description.max' => 'Description phải từ :max ký tự trở lên',
         ]);
-        $data = [
-            'title' => $request->title,
-            'description' => $request->description,
-        ];
-        $post = DB::table('posts')->where('id', $id)->update($data);
-        if ($post) {
-            $arr = [
-                'status' => true,
-                'message' => "Thành công",
-                'data' => $post
-            ];
+
+        if ($validator->fails()) {
+            $errors = $validator->errors()->all();
+            return response()->json($errors, 412);
         } else {
-            $arr = [
-                'status' => false,
-                'message' => "Thất bại",
-                'data' => $post
+            $data = [
+                'title' => $request->title,
+                'description' => $request->description,
             ];
+            $post = DB::table('posts')->where('id', $id)->update($data);
+            if ($post) {
+                $arr = [
+                    'status' => true,
+                    'message' => "Thành công",
+                    'data' => $post
+                ];
+            } else {
+                $arr = [
+                    'status' => false,
+                    'message' => "Thất bại",
+                    'data' => $post
+                ];
+            }
+            return response()->json($arr, 200);
         }
-        return response()->json($arr, 200);
     }
 
     /**
