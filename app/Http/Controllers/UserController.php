@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -66,7 +67,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|min:3|max:15',
             'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|confirmed',
@@ -74,7 +75,7 @@ class UserController extends Controller
             'name.required' => 'Họ và tên bắt buộc phải nhập',
             'name.string' => 'Họ và tên bắt buộc là string',
             'name.min' => 'Họ và tên phải từ :min ký tự trở lên',
-            'name.max' => 'Họ và tên phải từ :max ký tự trở lên',
+            'name.max' => 'Họ và tên phải nhỏ hơn :max ký tự',
             'email.required' => 'Email bắt buộc phải nhập',
             'email.email' => 'Email không đúng định dạng',
             'email.unique' => 'Email đã tồn tại trên hệ thống',
@@ -83,16 +84,21 @@ class UserController extends Controller
             'password.string' => 'Password bắt buộc là string',
             'password.confirmed' => 'Password xác nhận không đúng',
         ]);
-        $data = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
-        ];
-        $user = DB::table('users')->insert($data);
-        if ($user) {
-            return response()->json('Thành công', 200);
+        if ($validator->fails()) {
+            $errors = $validator->errors()->all();
+            return response()->json($errors, 412);
         } else {
-            return response()->json('Thất bại', 400);
+            $data = [
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => $request->password,
+            ];
+            $user = DB::table('users')->insert($data);
+            if ($user) {
+                return response()->json('Thành công', 200);
+            } else {
+                return response()->json('Thất bại', 400);
+            }
         }
     }
 
@@ -178,7 +184,7 @@ class UserController extends Controller
      */
     public function update($id, Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|min:3|max:15',
             'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|confirmed',
@@ -186,7 +192,7 @@ class UserController extends Controller
             'name.required' => 'Họ và tên bắt buộc phải nhập',
             'name.string' => 'Họ và tên bắt buộc là string',
             'name.min' => 'Họ và tên phải từ :min ký tự trở lên',
-            'name.max' => 'Họ và tên phải từ :max ký tự trở lên',
+            'name.max' => 'Họ và tên phải nhỏ hơn :max ký tự',
             'email.required' => 'Email bắt buộc phải nhập',
             'email.email' => 'Email không đúng định dạng',
             'email.unique' => 'Email đã tồn tại trên hệ thống',
@@ -195,26 +201,31 @@ class UserController extends Controller
             'password.string' => 'Password bắt buộc là string',
             'password.confirmed' => 'Password xác nhận không đúng',
         ]);
-        $data = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
-        ];
-        $user = DB::table('users')->where('id', $id)->update($data);
-        if ($user) {
-            $arr = [
-                'status' => true,
-                'message' => "Thành công",
-                'data' => $user
-            ];
+        if ($validator->fails()) {
+            $errors = $validator->errors()->all();
+            return response()->json($errors, 412);
         } else {
-            $arr = [
-                'status' => false,
-                'message' => "Thất bại",
-                'data' => $user
+            $data = [
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => $request->password,
             ];
+            $user = DB::table('users')->where('id', $id)->update($data);
+            if ($user) {
+                $arr = [
+                    'status' => true,
+                    'message' => "Thành công",
+                    'data' => $user
+                ];
+            } else {
+                $arr = [
+                    'status' => false,
+                    'message' => "Thất bại",
+                    'data' => $user
+                ];
+            }
+            return response()->json($arr, 200);
         }
-        return response()->json($arr, 200);
     }
 
     /**
