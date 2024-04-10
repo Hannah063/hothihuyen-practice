@@ -47,6 +47,15 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "user_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -120,6 +129,15 @@
                         "name": "description",
                         "in": "query",
                         "description": "post's description",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "user_id",
                         "required": true,
                         "schema": {
                             "type": "string"

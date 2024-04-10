@@ -93,7 +93,7 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => $request->password,
             ];
-            DB::table('users')->insert($data);
+            $user = DB::table('users')->insert($data);
             if ($request->number) {
                 $user = User::where('email', $request->email)->first();
                 $phone = $user->phone()->create([
@@ -127,7 +127,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::with('phone')->where('id', $id)->get();
+        $user = User::with('post')->where('id', $id)->get();
         if ($user) {
             $arr = [
                 'success' => true,

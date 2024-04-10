@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Post;
 
 class PostController extends Controller
 {
@@ -48,6 +49,13 @@ class PostController extends Controller
      *         required=true,
      *         @OA\Schema(type="string")
      *     ),
+     *     @OA\Parameter(
+     *         name="user_id",
+     *         in="query",
+     *         description="user_id",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
      *     @OA\Response(response="201", description="Successfully"),
      *     @OA\Response(response="400", description="Errors")
      * )
@@ -57,6 +65,7 @@ class PostController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|unique:posts|max:100|min:5',
             'description' => 'required|max:50|min:10',
+            'user_id' => 'required',
         ], [
             'title.required' => 'Title bắt buộc phải nhập',
             'title.min' => 'Title phải từ :min ký tự trở lên',
@@ -65,6 +74,7 @@ class PostController extends Controller
             'description.required' => 'Description bắt buộc phải nhập',
             'description.min' => 'Description phải từ :min ký tự trở lên',
             'description.max' => 'Description phải từ :max ký tự trở lên',
+            'user_id.required' => 'user_id bắt buộc phải nhập',
         ]);
 
         if ($validator->fails()) {
@@ -74,6 +84,7 @@ class PostController extends Controller
             $data = [
                 'title' => $request->title,
                 'description' => $request->description,
+                'user_id' => $request->user_id,
             ];
             $post = DB::table('posts')->insert($data);
             if ($post) {
@@ -113,12 +124,21 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post = DB::table('posts')->where('id', $id)->first();
+        $post = Post::with('user')->where('id', $id)->first();
         if ($post) {
+            $userName = $post->user->name;
+            $formattedPost = [
+                'id' => $post->id,
+                'title' => $post->title,
+                'description' => $post->description,
+                'created_by' => $userName,
+                'created_at' => $post->created_at,
+                'updated_at' => $post->updated_at,
+            ];
             $arr = [
                 'status' => true,
                 'message' => "Thành công",
-                'data' => $post
+                'data' => $formattedPost
             ];
         } else {
             $arr = [
@@ -156,6 +176,13 @@ class PostController extends Controller
      *         required=true,
      *         @OA\Schema(type="string")
      *     ),
+     *     @OA\Parameter(
+     *         name="user_id",
+     *         in="query",
+     *         description="user_id",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
      *     @OA\Response(response="201", description="Successfully"),
      *     @OA\Response(response="400", description="Errors")
      * )
@@ -165,6 +192,7 @@ class PostController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|unique:posts|max:100|min:5',
             'description' => 'required|max:50|min:10',
+            'user_id' => 'required',
         ], [
             'title.required' => 'Title bắt buộc phải nhập',
             'title.min' => 'Title phải từ :min ký tự trở lên',
@@ -173,6 +201,7 @@ class PostController extends Controller
             'description.required' => 'Description bắt buộc phải nhập',
             'description.min' => 'Description phải từ :min ký tự trở lên',
             'description.max' => 'Description phải từ :max ký tự trở lên',
+            'user_id.required' => 'user_id bắt buộc phải nhập',
         ]);
 
         if ($validator->fails()) {
