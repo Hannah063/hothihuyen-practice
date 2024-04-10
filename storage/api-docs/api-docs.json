@@ -220,9 +220,9 @@
                         }
                     },
                     {
-                        "name": "password_confirmation",
+                        "name": "number",
                         "in": "query",
-                        "description": "password_confirmation",
+                        "description": "number",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -242,9 +242,9 @@
         "/api/users/{id}": {
             "get": {
                 "tags": [
-                    "Get a user"
+                    "Get one user by id"
                 ],
-                "summary": "Get a user",
+                "summary": "Get one user by id",
                 "operationId": "36a33ff774d5cba33c039dec2c3e0287",
                 "parameters": [
                     {
@@ -309,15 +309,6 @@
                         "name": "password",
                         "in": "query",
                         "description": "password",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "password_confirmation",
-                        "in": "query",
-                        "description": "password_confirmation",
                         "required": true,
                         "schema": {
                             "type": "string"

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
+
 
 class UserController extends Controller
 {
@@ -21,8 +23,7 @@ class UserController extends Controller
     {
         $users = DB::table('users')->get();
         $arr = [
-            'status' => true,
-            'message' => "Thành công",
+            'success' => true,
             'data' => $users
         ];
         return response()->json($arr, 200);
@@ -55,9 +56,9 @@ class UserController extends Controller
      *         @OA\Schema(type="string")
      *     ),
      *     @OA\Parameter(
-     *         name="password_confirmation",
+     *         name="number",
      *         in="query",
-     *         description="password_confirmation",
+     *         description="number",
      *         required=true,
      *         @OA\Schema(type="string")
      *     ),
@@ -70,7 +71,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|min:3|max:15',
             'email' => 'required|string|email|unique:users,email',
-            'password' => 'required|string|confirmed',
+            'password' => 'required|string',
         ], [
             'name.required' => 'Họ và tên bắt buộc phải nhập',
             'name.string' => 'Họ và tên bắt buộc là string',
@@ -82,7 +83,6 @@ class UserController extends Controller
             'email.string' => 'Email bắt buộc là string',
             'password.required' => 'Password bắt buộc phải nhập',
             'password.string' => 'Password bắt buộc là string',
-            'password.confirmed' => 'Password xác nhận không đúng',
         ]);
         if ($validator->fails()) {
             $errors = $validator->errors()->all();
@@ -93,7 +93,13 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => $request->password,
             ];
-            $user = DB::table('users')->insert($data);
+            DB::table('users')->insert($data);
+            if ($request->number) {
+                $user = User::where('email', $request->email)->first();
+                $phone = $user->phone()->create([
+                    'number' => $request->number,
+                ]);
+            }
             if ($user) {
                 return response()->json('Thành công', 200);
             } else {
@@ -105,8 +111,8 @@ class UserController extends Controller
     /**
      * @OA\Get(
      *     path="/api/users/{id}",
-     *     summary="Get a user",
-     *     tags = {"Get a user"},
+     *     summary="Get one user by id",
+     *     tags = {"Get one user by id"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -121,11 +127,10 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = DB::table('users')->where('id', $id)->first();
+        $user = User::with('phone')->where('id', $id)->get();
         if ($user) {
             $arr = [
-                'status' => true,
-                'message' => "Thành công",
+                'success' => true,
                 'data' => $user
             ];
         } else {
@@ -171,13 +176,6 @@ class UserController extends Controller
      *         required=true,
      *         @OA\Schema(type="string")
      *     ),
-     *     @OA\Parameter(
-     *         name="password_confirmation",
-     *         in="query",
-     *         description="password_confirmation",
-     *         required=true,
-     *         @OA\Schema(type="string")
-     *     ),
      *     @OA\Response(response="201", description="Successfully"),
      *     @OA\Response(response="400", description="Errors")
      * )
@@ -187,7 +185,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|min:3|max:15',
             'email' => 'required|string|email|unique:users,email',
-            'password' => 'required|string|confirmed',
+            'password' => 'required|string',
         ], [
             'name.required' => 'Họ và tên bắt buộc phải nhập',
             'name.string' => 'Họ và tên bắt buộc là string',
@@ -199,7 +197,6 @@ class UserController extends Controller
             'email.string' => 'Email bắt buộc là string',
             'password.required' => 'Password bắt buộc phải nhập',
             'password.string' => 'Password bắt buộc là string',
-            'password.confirmed' => 'Password xác nhận không đúng',
         ]);
         if ($validator->fails()) {
             $errors = $validator->errors()->all();
